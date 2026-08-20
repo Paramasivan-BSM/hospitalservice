@@ -3,13 +3,13 @@ package com.uyir.hospital.controller;
 import com.uyir.hospital.dto.DoctorCheckInRequest;
 import com.uyir.hospital.dto.DoctorRequest;
 import com.uyir.hospital.dto.DoctorResponse;
+import com.uyir.hospital.dto.DoctorSearchRequest;
 import com.uyir.hospital.dto.PageResponse;
-import com.uyir.hospital.model.enums.DoctorCategory;
-import com.uyir.hospital.model.enums.EngagementType;
 import com.uyir.hospital.service.DoctorService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -49,15 +48,16 @@ public class DoctorController {
         return doctorService.getById(id);
     }
 
-    @GetMapping
+    @PostMapping("/list")
+    public List<DoctorResponse> getAllDoctors() {
+        return doctorService.getAll();
+    }
+
+    @PostMapping("/search")
     public PageResponse<DoctorResponse> search(
-            @RequestParam(required = false) String specialty,
-            @RequestParam(required = false) String hospitalId,
-            @RequestParam(required = false) EngagementType engagementType,
-            @RequestParam(required = false) DoctorCategory doctorCategory,
-            @RequestParam(required = false) Boolean active,
+            @RequestBody(required = false) DoctorSearchRequest request,
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
-        return doctorService.search(specialty, hospitalId, engagementType, doctorCategory, active, pageable);
+        return doctorService.search(request != null ? request : new DoctorSearchRequest(), pageable);
     }
 
     @PutMapping("/{id}")

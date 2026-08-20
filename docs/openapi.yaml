@@ -239,28 +239,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
-    get:
+
+  /api/hospital/doctors/list:
+    post:
+      tags: [Doctors]
+      summary: List all doctors (unpaginated)
+      operationId: listAllDoctors
+      responses:
+        "200":
+          description: All doctors
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DoctorResponse" }
+
+  /api/hospital/doctors/search:
+    post:
       tags: [Doctors]
       summary: Search doctors (paginated)
       operationId: searchDoctors
       parameters:
-        - name: specialty
-          in: query
-          description: Case-insensitive exact match against any entry in specialties
-          schema: { type: string }
-        - name: hospitalId
-          in: query
-          description: Doctors with a hospitalAssociations entry for this hospital id
-          schema: { type: string }
-        - name: engagementType
-          in: query
-          schema: { $ref: "#/components/schemas/EngagementType" }
-        - name: doctorCategory
-          in: query
-          schema: { $ref: "#/components/schemas/DoctorCategory" }
-        - name: active
-          in: query
-          schema: { type: boolean }
         - name: page
           in: query
           schema: { type: integer, default: 0, minimum: 0 }
@@ -271,6 +270,12 @@ paths:
           in: query
           description: "e.g. sort=name,asc (default)"
           schema: { type: string }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoctorSearchRequest"
       responses:
         "200":
           description: Page of doctors
@@ -840,6 +845,29 @@ components:
         totalElements: { type: integer, format: int64 }
         totalPages: { type: integer }
         last: { type: boolean }
+
+    DoctorSearchRequest:
+      type: object
+      description: All fields optional; an empty/omitted body matches every doctor.
+      properties:
+        specialty:
+          type: string
+          nullable: true
+          description: Case-insensitive exact match against any entry in specialties
+        hospitalId:
+          type: string
+          nullable: true
+          description: Doctors with a hospitalAssociations entry for this hospital id
+        engagementType:
+          allOf: [$ref: "#/components/schemas/EngagementType"]
+          nullable: true
+        doctorCategory:
+          allOf: [$ref: "#/components/schemas/DoctorCategory"]
+          nullable: true
+        active: { type: boolean, nullable: true }
+      example:
+        specialty: "Cardiology"
+        active: true
 
     DoctorCheckInRequest:
       type: object

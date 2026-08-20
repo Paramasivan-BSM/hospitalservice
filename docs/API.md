@@ -340,25 +340,42 @@ curl -X POST http://localhost:8080/api/hospital/doctors \
 
 `GET /api/hospital/doctors/{id}` → 200 `DoctorResponse`, or 404 if not found.
 
-## List / search doctors (paginated)
+## List all doctors
 
-`GET /api/hospital/doctors`
+`POST /api/hospital/doctors/list`
 
-| Query param | Type | Notes |
+No request body. Returns the full, unpaginated `List<DoctorResponse>`.
+
+```bash
+curl -X POST http://localhost:8080/api/hospital/doctors/list
+```
+
+## Search doctors (paginated)
+
+`POST /api/hospital/doctors/search`
+
+Filters go in the JSON request body (`DoctorSearchRequest`); pagination stays in query params.
+
+| Body field | Type | Notes |
 |---|---|---|
 | `specialty` | string | case-insensitive exact match against any entry in `specialties` |
 | `hospitalId` | string | doctors with a `hospitalAssociations` entry for this hospital id |
 | `engagementType` | enum | `REGULAR`, `ON_CALL` |
 | `doctorCategory` | enum | `PRIMARY`, `FREELANCER` |
 | `active` | boolean | filter on soft-delete flag |
+
+| Query param | Type | Notes |
+|---|---|---|
 | `page` | int | 0-indexed, default `0` |
 | `size` | int | default `20`, max `100` |
 | `sort` | string | e.g. `sort=name,asc` (default) |
 
-Returns a `PageResponse<DoctorResponse>` — same envelope shape as the hospital search endpoint.
+All body fields are optional — an empty/omitted body returns every doctor, paginated. Returns a `PageResponse<DoctorResponse>` — same envelope shape as the hospital search endpoint.
 
 ```bash
-curl "http://localhost:8080/api/hospital/doctors?specialty=Cardiology&active=true&page=0&size=20"
+curl -X POST "http://localhost:8080/api/hospital/doctors/search?page=0&size=20" \
+  -H "Content-Type: application/json" \
+  -d '{ "specialty": "Cardiology", "active": true }'
 ```
 
 ## Update a doctor

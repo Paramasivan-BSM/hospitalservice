@@ -188,20 +188,32 @@
 					}
 				},
 				{
-					"name": "Search Doctors",
+					"name": "List All Doctors",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/hospital/doctors?specialty=Cardiology&active=true&page=0&size=20&sort=name,asc",
+							"raw": "{{baseUrl}}/api/hospital/doctors/list",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "api", "hospital", "doctors" ],
+							"path": [ "api", "hospital", "doctors", "list" ]
+						}
+					}
+				},
+				{
+					"name": "Search Doctors",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"specialty\": \"Cardiology\",\n  \"active\": true\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/hospital/doctors/search?page=0&size=20&sort=name,asc",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "hospital", "doctors", "search" ],
 							"query": [
-								{ "key": "specialty", "value": "Cardiology" },
-								{ "key": "hospitalId", "value": "{{hospitalId}}", "disabled": true },
-								{ "key": "engagementType", "value": "", "disabled": true },
-								{ "key": "doctorCategory", "value": "", "disabled": true },
-								{ "key": "active", "value": "true" },
 								{ "key": "page", "value": "0" },
 								{ "key": "size", "value": "20" },
 								{ "key": "sort", "value": "name,asc" }

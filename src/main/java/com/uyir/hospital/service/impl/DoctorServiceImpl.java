@@ -2,14 +2,13 @@ package com.uyir.hospital.service.impl;
 
 import com.uyir.hospital.dto.DoctorRequest;
 import com.uyir.hospital.dto.DoctorResponse;
+import com.uyir.hospital.dto.DoctorSearchRequest;
 import com.uyir.hospital.dto.PageResponse;
 import com.uyir.hospital.exception.DuplicateResourceException;
 import com.uyir.hospital.exception.ResourceNotFoundException;
 import com.uyir.hospital.mapper.DoctorMapper;
 import com.uyir.hospital.model.Doctor;
 import com.uyir.hospital.model.embedded.HospitalAssociation;
-import com.uyir.hospital.model.enums.DoctorCategory;
-import com.uyir.hospital.model.enums.EngagementType;
 import com.uyir.hospital.repository.DoctorRepository;
 import com.uyir.hospital.repository.DoctorSearchCriteria;
 import com.uyir.hospital.repository.HospitalRepository;
@@ -49,20 +48,18 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public PageResponse<DoctorResponse> search(
-            String specialty,
-            String hospitalId,
-            EngagementType engagementType,
-            DoctorCategory doctorCategory,
-            Boolean active,
-            Pageable pageable) {
+    public List<DoctorResponse> getAll() {
+        return doctorRepository.findAll().stream().map(doctorMapper::toResponse).toList();
+    }
 
+    @Override
+    public PageResponse<DoctorResponse> search(DoctorSearchRequest request, Pageable pageable) {
         DoctorSearchCriteria criteria = DoctorSearchCriteria.builder()
-                .specialty(specialty)
-                .hospitalId(hospitalId)
-                .engagementType(engagementType)
-                .doctorCategory(doctorCategory)
-                .active(active)
+                .specialty(request.getSpecialty())
+                .hospitalId(request.getHospitalId())
+                .engagementType(request.getEngagementType())
+                .doctorCategory(request.getDoctorCategory())
+                .active(request.getActive())
                 .build();
 
         return PageResponse.from(doctorRepository.search(criteria, pageable).map(doctorMapper::toResponse));
